@@ -23,7 +23,7 @@ data$bedrooms[which(is.na(data$bedrooms))] <- 2.5
 data$bathrooms[which(is.na(data$bathrooms))] <- 2
 data$sqft_lot[which(is.na(data$sqft_lot))] <- 6500
 ##Use data2 from her because it has less columns. I left data alone to retain its columns
-data2 <- subset(data, select = c(price, bedrooms, bathrooms, sqft_living, sqft_lot, waterfront, view))
+data2 <- subset(data, select = c(price, bedrooms, bathrooms, sqft_living, sqft_lot, waterfront, view, grade))
 head(data2)
 #missing data is filled in.
 ##Moving forward we will look at the outliers of the main categories that we will be inspecting.
@@ -37,7 +37,7 @@ boxplot(data2$price)
 ##outliers > 1000000
 boxplot(data2$sqft_lot)
 
-boxplot(data$grade)
+boxplot(data2$grade)
 ##outliers >9 and less than 6
 
 
@@ -58,7 +58,7 @@ boxplot(data2$bathrooms)
 boxplot(data2$bedrooms)
 boxplot(data2$sqft_living)
 boxplot(data2$price)
-boxplot(data$grade)
+boxplot(data2$grade)
 
 ##data$bathrooms <- data$bathrooms(is.na(data$bathrooms))
 ggplot(data2, aes(x=sqft_living, y=price, color = bedrooms)) + geom_point()
@@ -71,7 +71,7 @@ summary(model1)
 #testing correlation between variables
 
 # correlation between price and sqft_living
-cor_1 <- cor.test(data$price, data$sqft_living, 
+cor_1 <- cor.test(data2$price, data2$sqft_living, 
                   method = "pearson")
 cor_1
 sprintf("The correlation Index between price and sqft living is %f" , cor_1$estimate)
@@ -79,7 +79,7 @@ sprintf("The correlation Index between price and sqft living is %f" , cor_1$esti
 #Both have moderate correlation 
 
 #correlation  Index between price and sqft_lot
-cor_2 <- cor.test(data$price, data$sqft_lot, 
+cor_2 <- cor.test(data2$price, data2$sqft_lot, 
                   method = "pearson")
 cor_2
 sprintf("The correlation Index between price and sqft lot is %f" , cor_2$estimate)
@@ -87,13 +87,13 @@ sprintf("The correlation Index between price and sqft lot is %f" , cor_2$estimat
 #very less correlation almost 0.
 
 # Now testing correlation between price and condition.
-cor_3 <- cor.test(data$price, data$condition, 
+cor_3 <- cor.test(data2$price, data2$condition, 
                   method = "pearson")
 cor_3
 sprintf("The correlation Index between price and condition is %f" , cor_3$estimate)
 
 #correlation between price and yr_built.
-cor_4 <- cor.test(data$price, data$yr_built, 
+cor_4 <- cor.test(data2$price, data2$yr_built, 
                   method = "pearson")
 cor_4
 sprintf("The correlation Index between price and yr_built  is %f" , cor_4$estimate)
@@ -105,10 +105,63 @@ ggplot(data, aes(price, yr_renovated, color= bathrooms)) + geom_point()
 
 
 #correlation  between price and grade
-cor_5 <- cor.test(data$price, data$grade, 
+cor_5 <- cor.test(data2$price, data2$grade, 
                   method = "pearson")
 cor_5
-ggplot(data, aes(price, grade , color= bedrooms)) + geom_point()
+ggplot(data2, aes(price, grade , color= bedrooms)) + geom_point()
 #boxplot(data$grade)
+
+#linear regression of price with one predictor variable sqft lot
+regr_1= lm(price ~ sqft_lot, data = data2)
+summary(regr_1)
+
+#linear regression with two predictor variables i.e grade and sqft_lot
+regr_2= lm(price ~ sqft_lot + grade , data = data2)
+summary(regr_2)
+unique(data2$grade)
+as.data.frame(table(data2$grade))
+#subsetting data with graede 6
+data_g6 <-  data2[ which(data2$grade==6), ]
+head(data_g6)
+#finding correlation between price and sqftliving of grade 6 data
+corr_g6<- cor.test(data_g6$price, data_g6$sqft_living, 
+                   method = "pearson")
+corr_g6
+
+#subsetting data with grade 7
+data_g7 <- data2[ which(data2$grade==7), ]
+head(data_g7)
+#finding correlation between price and sqftliving of grade 7 data
+corr_g7<- cor.test(data_g7$price, data_g7$sqft_living, 
+               method = "pearson")
+corr_g7
+
+#subsetting data woth grade 8
+data_g8 <- data2[ which(data2$grade==8), ]
+head(data_g8)
+#finding correlation between price and sqftliving of grade 8 data
+corr_g8<- cor.test(data_g8$price, data_g8$sqft_living, 
+                   method = "pearson")
+corr_g8
+#subsetting data woth grade 9
+data_g9 <- data2[ which(data2$grade==9), ]
+head(data_g9)
+#finding correlation between price and sqftliving of grade 8 data
+corr_g9<- cor.test(data_g9$price, data_g9$sqft_living, 
+                   method = "pearson")
+corr_g9
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
