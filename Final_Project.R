@@ -23,77 +23,53 @@ data$bedrooms[which(is.na(data$bedrooms))] <- 2.5
 data$bathrooms[which(is.na(data$bathrooms))] <- 2
 data$sqft_lot[which(is.na(data$sqft_lot))] <- 6500
 ##Use data2 from her because it has less columns. I left data alone to retain its columns
-data2 <- subset(data, select = c(price, bedrooms, bathrooms, sqft_living, sqft_lot, waterfront, view))
-head(data2)
+
+#Removing date column to check correlation table
 data.cor <- subset(data, select = -c(date))
 head(data.cor)
 cor(data.cor)
-
-
+#Columns with high correlation values with grade as dependent variable:
+#price, bathrooms, sqft_living, floors,sqft_above, yr_built, sqft_living15
+data2 <- subset(data, select = c(grade, price, bathrooms, sqft_living, floors, yr_built, sqft_living15))
+head(data2)
 #missing data is filled in.
 ##Moving forward we will look at the outliers of the main categories that we will be inspecting.
 boxplot(data2$bathrooms)
 ##bathroom outlier > 4
-boxplot(data2$bedrooms)
-##bedroom outliers <2 and >5
+boxplot(data2$floors)
+##no outliers
+boxplot(data2$yr_built)
+##no outliers
 boxplot(data2$sqft_living)
 ##sqft_living outliers > 4000
+boxplot(data2$sqft_living15)
+##sqft_living outliers > 3700
 boxplot(data2$price)
 ##outliers > 1000000
 boxplot(data2$sqft_lot)
 
 
 #checking and removing outliers and putting back into data2
-data2 <- subset(data2, bedrooms <=5 
-                       & bedrooms >= 2 
+data2 <- subset(data2, sqft_living15 < 3750
                        & sqft_living < 3500 
                        & bathrooms < 3.5 
-                       & price <= 900000
-                       & sqft_lot <=13000)
+                       & price <= 900000)
 ##Making a scaled version of data2 to use in linear regression models
 data2.scaled <- scale(data2)
-cor(data)
+cor(data2.scaled)
 data2.df <- as.data.frame(data2.scaled)
-typeof(data2.df)
-
-head(data2.scaled)
-boxplot(data2$sqft_lot)
-boxplot(data2$bathrooms)
-boxplot(data2$bedrooms)
-boxplot(data2$sqft_living)
-boxplot(data2$price)
-
-
-data3 <- subset(data, select = c(price, bathrooms, sqft_living, grade))
-cor(data3)
-boxplot(data3$grade)
-data3 <- subset(data3, sqft_living < 3500 
-                & bathrooms < 3.5 
-                & price <= 900000
-                & grade >= 6
-                & grade <= 9)
-#data3.scaled <- scale(data3)
-data3.df <- as.data.frame(data3)
-
-##data$bathrooms <- data$bathrooms(is.na(data$bathrooms))
-ggplot(data2, aes(x=sqft_living, y=price, color = bedrooms)) + geom_point()
-ggplot(data2, aes(x = sqft_living, y = (price/10000), color = grade)) + geom_point()
-
-##Linear Models for data3
-model1 <- lm(price ~ grade, data = data3.df)
-model2 <- lm(price ~ sqft_living + bathrooms, data = data3.df)
-model3 <- lm(price ~ sqft_living + bathrooms + grade, data = data3.df)
-summary(model1)
-summary(model2)
-summary(model3)
-plot(model1)
-
-
+##making a multiple linear regression model 
+m1 <- lm(grade ~ price + sqft_living + yr_built + sqft_living15, data = data2.df)
+m2 <- lm(price ~ grade + sqft_living + yr_built + sqft_living15, data = data2.df)
+summary(m1)
+summary(m2)
 require(scatterplot3d)
-library(nat)
 library(rgl)
-plot3d(data3[1:5000,1:3], )
-with(iris, plot3)
-?scatterplot3d
+head(data2.df)
+##plot3d(data2$price, data2$sqft_living, data2$yr_built, col = data2$grade)
+scatterplot3d(data2$price, data2$sqft_living, data2$yr_built, 
+              color = data2$grade,
+              type="p",
+              )
 
-?lm
+?scatterplot3d
