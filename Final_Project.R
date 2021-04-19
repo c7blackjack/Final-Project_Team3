@@ -1,4 +1,5 @@
 ## Hi Team! This is a test to see if we can use github to collaborate.
+library(rgl)
 library(pacman)
 library(ggplot2)
 library(dplyr)
@@ -7,8 +8,9 @@ library(tidyverse)
 library(lubridate)
 
 
-data <- read.csv("house_sales.csv")
+data <- read.csv("/Users/sakshyamdahal/Desktop/MS Data Science/Data Science Programming/Week7 Project/Dataset 2 (House Sales)/house_sales.csv")
 attach(data)
+head(data)
 #Convert date column using lubridate package
 data$date <- parse_date_time(data[,2], orders = "%Y%m%%d%H%M%S")
 head(data)
@@ -32,6 +34,7 @@ cor(data.cor)
 #price, bathrooms, sqft_living, floors,sqft_above, yr_built, sqft_living15
 data2 <- subset(data, select = c(grade, price, bathrooms, sqft_living, floors, yr_built, sqft_living15))
 head(data2)
+colSums(is.na(data2))
 #missing data is filled in.
 ##Moving forward we will look at the outliers of the main categories that we will be inspecting.
 boxplot(data2$bathrooms)
@@ -46,7 +49,7 @@ boxplot(data2$sqft_living15)
 ##sqft_living outliers > 3700
 boxplot(data2$price)
 ##outliers > 1000000
-boxplot(data2$sqft_lot)
+boxplot(data2$grade)
 
 
 #checking and removing outliers and putting back into data2
@@ -60,7 +63,11 @@ cor(data2.scaled)
 data2.df <- as.data.frame(data2.scaled)
 ##making a multiple linear regression model 
 m1 <- lm(grade ~ price + sqft_living + yr_built + sqft_living15, data = data2)
+<<<<<<< HEAD
 m2 <- lm(price ~ grade + sqft_living + yr_built + sqft_living15, data = data2)
+=======
+m2 <- lm(price ~ grade + sqft_living  + sqft_living15, data = data2)
+>>>>>>> 3e6153f24caf043fbd39bceb59e26711521ec7af
 summary(m1)
 summary(m2)
 
@@ -68,7 +75,7 @@ summary(m2)
 ##3dscatterplot comparing yr_built,price and sqft_living colored by grade
 require(scatterplot3d)
 library(rgl)
-head(data2.df)
+(data2.df)
 ##plot3d(data2$price, data2$sqft_living, data2$yr_built, col = data2$grade)
 scatterplot3d(data2$price, data2$sqft_living, data2$yr_built, 
               color = data2$grade,
@@ -80,3 +87,4 @@ scatterplot3d(data2$price, data2$sqft_living, data2$yr_built,
               )
 
 ?scatterplot3d
+
