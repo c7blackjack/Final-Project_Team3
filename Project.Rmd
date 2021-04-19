@@ -1,0 +1,169 @@
+##  Final Project: Data Analysis and Preliminary Analytics
+### Team 3 :
+#### Sindhu Bhattarai
+#### Emina Belekanich
+#### Travis Lloyd
+
+**Data Importing and Pre-processing:**
+In this part we are going to first get necessary package,import our csv file, start checking for NAs and outliers.
+
+                                    
+```{r}
+library(pacman)
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(tidyverse)
+library(lubridate)
+library(rgl)
+require(scatterplot3d)
+
+
+data <- read.csv("/Users/sakshyamdahal/Desktop/MS Data Science/Data Science Programming/Week7 Project/Dataset 2 (House Sales)/house_sales.csv")
+
+attach(data)
+head(data)
+```
+
+
+Converting date column using lubridate package
+
+```{r}
+data$date <- parse_date_time(data[,2], orders = "%Y%m%%d%H%M%S")
+head(data)
+```
+
+Checking where empty values are located.
+
+```{r}
+colSums(is.na(data))
+```
+
+fill in sqft_living with basic addition of sqft_above and sqft_basement
+
+```{r}
+data$sqft_living <- data$sqft_above + data$sqft_basement
+head(data)
+```
+We have filled in sqft_living  by adding sqft_above and sqft_basement.
+
+Fill in bedrooms and bathrooms
+```{r}
+data$bedrooms[which(is.na(data$bedrooms))] <- 2.5
+data$bathrooms[which(is.na(data$bathrooms))] <- 2
+data$sqft_lot[which(is.na(data$sqft_lot))] <- 6500
+```
+Here we have filled the NAs with median value of the respective vector.
+
+**Data Analysis and Visualization:**
+
+In this part we are going to visualize the outliers using  boxplots, deal with outliers and check the correlations between the variables to better know the relationship among the variables. 
+
+
+Removing date column to check correlation table
+
+```{r}
+data.cor <- subset(data, select = -c(date))
+head(data.cor)
+cor(data.cor)
+```
+
+Columns with high correlation values with grade as dependent variable:price, bathrooms, sqft_living, floors,sqft_above, yr_built, sqft_living15
+
+```{r}
+data2 <- subset(data, select = c(grade, price, bathrooms, sqft_living, floors, yr_built, sqft_living15))
+head(data2)
+colSums(is.na(data2))
+```
+
+missing data is filled in.
+Moving forward we will look at the outliers of the main categories that we will be inspecting.
+
+```{r}
+boxplot(data2$bathrooms)
+
+boxplot(data2$floors)
+
+boxplot(data2$yr_built)
+
+boxplot(data2$sqft_living)
+boxplot(data2$sqft_living15)
+
+boxplot(data2$price)
+
+boxplot(data2$grade)
+```
+
+bathroom outlier > 4
+floors no outliers
+yr_built no outliers
+sqft_living outliers > 4000
+sqft_living_15 outliers > 3700
+Price outliers > 1000000
+
+Removing outliers and  subsetting necessary variables
+
+```{r}
+data2 <- subset(data2, sqft_living15 < 3750
+                       & sqft_living < 3500 
+                       & bathrooms < 3.5 
+                       & price <= 900000)
+```
+
+**Data Analytics:**
+In this part we are going to construct a regression model to make the prediction. 
+
+
+Making a scaled version of data2 to check the correlations use in linear regression models                 
+```{r}
+data2.scaled <- scale(data2)
+cor(data2.scaled)
+data2.df <- as.data.frame(data2.scaled)
+```
+ We noticed  in the correlation table that grade has comparatively higher correlation with price, sqft_living, yr_built and sqft_living15. Here in our first regression model we have taken grade as the dependent variable. 
+ 
+ Second we noticed that price also has  comparatively higher correlation with grade, sqft_living and sqft_living15. In our second regression model we have taken price as the dependent variable and rest other variables with higher correlations as predictor variables. 
+
+Making a multiple linear regression model of both grade and price and check which one is more relevant. 
+
+```{r}
+m1 <- lm(grade ~ price + sqft_living + yr_built + sqft_living15, data = data2)
+m2 <- lm(price ~ grade + sqft_living  + sqft_living15, data = data2)
+summary(m1)
+summary(m2)
+```
+
+The equation of multiple regression line is y= m1*x1 + m2*x2 + m3*x3 +.... mn*xn + c
+
+Here as we can see in our first regression summary. The equation of the regression line of grade prediction is: 
+grade = (1.902e-06 * price) +  (3.204e-04 * sqft_living) + (1.164e-02 * yr_built) + 2.672e-04(sqft_living15) - 1.745e+01
+
+Moving forward to predict the price our equation will be:
+price = (6.200e+04 * grade) + (6.597e+01 * sqft_living) + (3.784e+01* sqft_living15) -2.076e+05
+
+Plotting 3d model for multiple regression
+
+```{r}
+
+scatterplot3d(data2$price, data2$sqft_living, data2$yr_built, 
+              color = data2$grade,
+              type="p",)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                    
