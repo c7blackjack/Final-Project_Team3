@@ -59,10 +59,13 @@ data2.scaled <- scale(data2)
 cor(data2.scaled)
 data2.df <- as.data.frame(data2.scaled)
 ##making a multiple linear regression model 
-m1 <- lm(grade ~ price + sqft_living + yr_built + sqft_living15, data = data2.df)
-m2 <- lm(price ~ grade + sqft_living + yr_built + sqft_living15, data = data2.df)
+m1 <- lm(grade ~ price + sqft_living + yr_built + sqft_living15, data = data2)
+m2 <- lm(price ~ grade + sqft_living + yr_built + sqft_living15, data = data2)
 summary(m1)
 summary(m2)
+
+
+##3dscatterplot comparing yr_built,price and sqft_living colored by grade
 require(scatterplot3d)
 library(rgl)
 head(data2.df)
@@ -70,6 +73,10 @@ head(data2.df)
 scatterplot3d(data2$price, data2$sqft_living, data2$yr_built, 
               color = data2$grade,
               type="p",
+              zlab = "Year Built",
+              ylab = "Square Feet",
+              xlab = "Price",
+              legend3d(color)
               )
 
 ?scatterplot3d
