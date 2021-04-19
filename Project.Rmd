@@ -94,12 +94,12 @@ boxplot(data2$price)
 boxplot(data2$grade)
 ```
 
-bathroom outlier > 4
+bathroom outlier > 3.5
 floors no outliers
 yr_built no outliers
-sqft_living outliers > 4000
-sqft_living_15 outliers > 3700
-Price outliers > 1000000
+sqft_living outliers > 3500
+sqft_living_15 outliers > 3750
+Price outliers > 900000
 
 Removing outliers and  subsetting necessary variables
 
