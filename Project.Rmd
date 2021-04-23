@@ -19,7 +19,7 @@ library(rgl)
 require(scatterplot3d)
 
 
-data <- read.csv("/Users/sakshyamdahal/Desktop/MS Data Science/Data Science Programming/Week7 Project/Dataset 2 (House Sales)/house_sales.csv")
+data <- read.csv("house_sales.csv")
 
 attach(data)
 head(data)
@@ -145,7 +145,7 @@ Plotting 3d model for multiple regression
 
 ```{r}
 
-scatterplot3d(data2$price, data2$sqft_living, data2$yr_built, 
+scatterplot3d(data2$price, data2$sqft_living, data2$sqft_living15, 
               color = data2$grade,
               type="p",)
 ```
